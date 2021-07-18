@@ -6,3 +6,5 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Create your views here.
+class RecipeViewSet(viewsets.ModelViewSet):
+    pass

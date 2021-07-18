@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 # from .forms import PostForm, CommentForm
 from django.core.paginator import Paginator
 from .models import User, Recipe, Ingredient, Follow
+from .forms import RecipeForm
 
 # Create your views here.
 def index(requst):
@@ -16,9 +17,19 @@ def index(requst):
 
 @login_required
 def new_recipe(request):
-    pass
+    if request.method == 'POST':
+        form = RecipeForm(request.POST or None)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            recipe.author = request.user
+            recipe.save()
+            return redirect('index')
+        #return render()
+            pass
 
 def recipe_view(request, username, recipe_id):
+    if request.method =='POST':
+        form = RecipeForm
     pass
 
 def profile(request, username):

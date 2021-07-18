@@ -14,6 +14,11 @@ import os
 
 from pathlib import Path
 
+from dotenv import load_dotenv
+load_dotenv()
+
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import djoser
 
