@@ -12,9 +12,14 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import datetime
 import os
 
+# from users.models import CustomUser
+
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+
+
 load_dotenv()
 
 # os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
@@ -34,11 +39,10 @@ SECRET_KEY = '@m9nfdr9r!$kd-txd3mtq%1xknwb7j=hy0wkg0ic_x@eod3!3!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,12 +50,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
     'djoser',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'recipes',
-    'api_v1'
+    'api_v1',
+
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -61,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
@@ -99,6 +109,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -138,9 +149,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# DJOSER = {}
 
-# SIMPLEJWT = {}
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -158,3 +167,34 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 10
 }
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer'
+    },
+    'PERMISSIONS': {
+        'activation': ['rest_framework.permissions.AllowAny'],
+        'password_reset': ['rest_framework.permissions.AllowAny'],
+        'password_reset_confirm': ['rest_framework.permissions.AllowAny'],
+        'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+        'username_reset': ['rest_framework.permissions.AllowAny'],
+        'username_reset_confirm': ['rest_framework.permissions.AllowAny'],
+        'set_username': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_create': ['rest_framework.permissions.AllowAny'],
+        'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'token_create': ['rest_framework.permissions.AllowAny'],
+        'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
+    }
+  }
+
+
+
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
+# ]
