@@ -7,51 +7,61 @@ from .serializers import (
     TagSerializer,
     FollowSerializer,
     FavoriteSerializer,
-    ShoppingSerializer)
+    ShoppingSerializer,
+    UserSerializer
+)
 from api_v1.models import Recipe, Ingredient, Tag, Follow
+from users.models import CustomUser
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
-from .permissions import IsAuthorOrReadOnly
+from .paginators import PageNumberPaginatorModified
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated, AllowAny
+from .permissions import AdminOrAuthorOrReadOnly
 
-PERMISSION_CLASSES = [IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthorOrReadOnly]
+
+# PERMISSION_CLASSES = [IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthorOrReadOnly]
+
+class UserListViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+    pagination_class = PageNumberPaginatorModified
+    queryset = CustomUser.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filteset_fields = ['email', 'username']
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    permission_classes = (AdminOrAuthorOrReadOnly,)
+    pagination_class = PageNumberPaginatorModified
     queryset = Recipe.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['author', 'name', 'tag']
+    filterset_fields = ['author', 'name', 'tags']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    pass
-
 
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]
+    permission_classes = (AllowAny,)
+    pagination_class = None
     queryset = Ingredient.objects.all()
-
-    pass
 
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]
+    pagination_class = None
+    permission_classes = (AllowAny,)
     queryset = Tag.objects.all()
-    pass
 
 
 class FavoriteVeiwSet(viewsets.ModelViewSet):
     serializer_class = FavoriteSerializer
     queryset = Recipe.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     class Meta:
         fields = '__all__'
-
-    pass
 
 
 class ShoppingcartViewSet(viewsets.ModelViewSet):
@@ -60,8 +70,6 @@ class ShoppingcartViewSet(viewsets.ModelViewSet):
 
     class Meta:
         fields = '__all__'
-
-    pass
 
 
 class FollowViewSet(viewsets.ModelViewSet):
@@ -78,5 +86,3 @@ class FollowViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return user.following.all()
-
-    pass

@@ -13,7 +13,7 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     volumes:
-      - ../frontend/:/app/result_build
+      - foogdram-project-react/frontend/:/app/result_build
     depends_on:
       - db
 
