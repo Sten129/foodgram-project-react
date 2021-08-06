@@ -1,0 +1,35 @@
+модели (Models)  - доаботать модель Recipe и Ingredients in Recipe, понять, как работает IngredientsInRecipe
+Вью(вьюсеты) - доработать вьюсеты или вьюшки Shoppingcart b Favorited
+Роутеры(urls) - сделать эндпоинты к API - вроде как сделано
+сериализаторы(serialiers) - доработать имеющиеся сериализаторы, проверить ошибку 'list' object isn not callable, relation does not exist - сделано
+формы(forms) - сделать формы в api_v1, проверить валидность форм, по возможности написать тесты
+пермишены(permissions) - переделано как у Павла Хана
+валидаторы(validators) - написать - посмотреть, нужны ли они
+тесты(tests) - написать по возможности
+Докер(Docker) - написать docker-compose.yml с контейнерами с фронтом и бэком
+CI/CD(Workflow) - написать Workflow(можно свистнуть из 19 спринта)
+Аутентификация - разобраться с моделями пользователей и с админкой
+
+Выписывем текущие траблы:
+
+проверяем модели на корректность related name
+разбираемся с миграциями - почему в БД есть дубликаты
+
+проверяем API -
+
+users - OK
+users/id - OK
+users/set_password/ - x не работает, надо сделать(NotFound)
+auth/token/login/ - х не работает, надо сделать
+auth/token/logout/ - х не работает, надо сделать
+Tags - x no tags
+tags/id - x no tags
+recipes - х нет рецептов
+recipes/id - х нет рецептов
+ingredients - OK
+ingredients/id/
+download_shopping_cart - не работает, надо сделать
+favorite - не отрабатывает, проверить url
+
+
+
