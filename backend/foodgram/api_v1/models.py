@@ -1,6 +1,6 @@
 from django.db import models
 
-from foodgram.settings import AUTH_USER_MODEL
+from foodgram.settings  import AUTH_USER_MODEL
 
 User = AUTH_USER_MODEL
 
@@ -20,17 +20,11 @@ class Ingredient(models.Model):
         return self.name
 
 
-class IngredientInRecipe(models.Model):
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredient',
-                                   verbose_name='Ингредиент в рецепте')
-    amount = models.PositiveSmallIntegerField(null=True, verbose_name='Количество ингредиента в рецепте')
-
-    class Meta:
-        verbose_name = 'Количество ингредиента в рецепте'
-        verbose_name_plural = verbose_name
-
-
 class Tag(models.Model):
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(args, kwargs)
+    #     self.through = None
+
     title = models.CharField(max_length=200)
     hexcode_color = models.CharField(default='#ffffff', max_length=50, verbose_name='Цвет')
     slug = models.SlugField(null=False, unique=False, help_text='URL')
@@ -41,14 +35,15 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    id = models.IntegerField(primary_key=True, db_index=True)
-    tags = models.ForeignKey(Tag, verbose_name='Список тегов', on_delete=models.CASCADE, related_name='tags')
+    # id = models.IntegerField(primary_key=True, db_index=True)
+    # tags = models.ForeignKey(Tag, verbose_name='Список тегов', on_delete=models.CASCADE, related_name='tags')
+    tags = models.ManyToManyField(Tag, related_name='recipes', blank=True, null=True, verbose_name='Тэги рецепта')
     author = models.ForeignKey(AUTH_USER_MODEL,
                                verbose_name='author',
                                on_delete=models.CASCADE,
                                related_name='recipes')
-    ingredients = models.ForeignKey(IngredientInRecipe, related_name='ingredients', on_delete=models.CASCADE)
-
+    # ingredients = models.ForeignKey(IngredientInRecipe, related_name='ingredients', on_delete=models.CASCADE)
+    ingredients = models.ManyToManyField(Ingredient, through='IngredientInRecipe', related_name='ingredients')
     name = models.CharField(
         max_length=200,
         null=False,
@@ -76,6 +71,20 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
     #   проверить!!!
+
+
+class IngredientInRecipe(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredient',
+                                   verbose_name='Ингредиент в рецепте')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, verbose_name='Рецепт')
+    amount = models.PositiveSmallIntegerField(null=True, verbose_name='Количество ингредиента в рецепте')
+
+    class Meta:
+        verbose_name = 'Количество ингредиента в рецепте'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'{self.ingredient} в {self.recipe}'
 
 
 class Follow(models.Model):
