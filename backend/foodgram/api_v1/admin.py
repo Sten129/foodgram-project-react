@@ -1,13 +1,8 @@
+from api_v1.models import Follow, Ingredient, IngredientInRecipe, IsFavorited, IsInShoppingCart, Recipe, Tag
 from django.contrib import admin
-
-from django.contrib import admin
-from api_v1.models import Recipe, Ingredient, Follow, Tag, IngredientInRecipe, IsFavorited, IsInShoppingCart
 
 
 class IngredientInline(admin.TabularInline):
-    """
-    Inline to show ingredients on recipe page.
-    """
     model = IngredientInRecipe
     insert_after = 'cooking_time'
 
@@ -26,7 +21,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     inlines = [
         IngredientInline,
-        # TagInline
+
     ]
 
 
@@ -42,15 +37,14 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
     search_fields = ('title',)
 
+
 class IngredientInRecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'ingredient', 'recipe', 'amount')
     empty_value_display = '-пусто-'
     search_fields = ('ingredient',)
 
+
 class TagInline(admin.TabularInline):
-    """
-    Inline to show ingredients on recipe page.
-    """
     model = Recipe.tags.through
     insert_after = 'image'
 

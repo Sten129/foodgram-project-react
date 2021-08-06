@@ -9,58 +9,37 @@ BASE_URL = 'http://127.0.0.1'
 
 
 class TagSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Tag
         fields = '__all__'
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Ingredient
         fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CustomUser
         fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', )
-
-
-# class UserRecipeSerializer(serializers.ModelSerializer):
-#     is_subscribed = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = Account
-#         fields = ('email', 'id', 'username',
-#                   'first_name', 'last_name', 'is_subscribed')
-#
-#     def get_is_subscribed(self, obj):
-#         request = self.context.get('request')
-#         if request is None or request.user.is_anonymous:
-#             return False
-#         return Follow.objects.filter(user=request.user, author=obj).exists()
+                  'first_name', 'last_name',)
 
 
 class FollowSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Follow
         fields = '__all__'
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class ShoppingSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -82,7 +61,6 @@ class ListRecipeUserSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = IngredientInRecipe
         fields = '__all__'
@@ -162,7 +140,6 @@ class ShowFollowerRecipeSerializer(serializers.ModelSerializer):
 
 
 class ShowFollowersSerializer(serializers.ModelSerializer):
-
     recipes = ShowFollowerRecipeSerializer(many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField('count_author_recipes')
     is_subscribed = serializers.SerializerMethodField('check_if_subscribed')
@@ -188,10 +165,9 @@ class ShowFollowersSerializer(serializers.ModelSerializer):
 
 
 class ShowIngredientsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Ingredient
-        fields = ('id', 'amount', )
+        fields = ('id', 'amount',)
 
 
 class UserSerializerModified(BaseUserSerializer):

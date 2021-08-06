@@ -1,6 +1,6 @@
 from django.db import models
 
-from foodgram.settings  import AUTH_USER_MODEL
+from foodgram.settings import AUTH_USER_MODEL
 
 User = AUTH_USER_MODEL
 
