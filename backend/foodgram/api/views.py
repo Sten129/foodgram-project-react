@@ -5,12 +5,12 @@ from .serializers import (
     RecipeSerializer,
     IngredientSerializer,
     TagSerializer,
-    FollowSerializer,
+    SubscribeSerializer,
     FavoriteSerializer,
     ShoppingSerializer,
     UserSerializer
 )
-from api_v1.models import Recipe, Ingredient, Tag, Follow
+from api.models import Recipe, Ingredient, Tag, Subscribe
 from users.models import CustomUser
 from rest_framework.pagination import PageNumberPagination
 from .paginators import PageNumberPaginatorModified
@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, I
 from .permissions import AdminOrAuthorOrReadOnly
 
 
-# PERMISSION_CLASSES = [IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthorOrReadOnly]
+
 
 class UserListViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
@@ -72,17 +72,16 @@ class ShoppingcartViewSet(viewsets.ModelViewSet):
         fields = '__all__'
 
 
-class FollowViewSet(viewsets.ModelViewSet):
-    serializer_class = FollowSerializer
+class SubscribeViewSet(viewsets.ModelViewSet):
+    serializer_class = SubscribeSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter]
     http_method_names = ('get', 'post')
-    # search_fields = ['user__username, 'following__username']
-    queryset = Follow.objects.all()
+    queryset = Subscribe.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
         user = self.request.user
-        return user.following.all()
+        return user.subscribed.all()

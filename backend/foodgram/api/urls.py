@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     FavoriteVeiwSet,
-    FollowViewSet,
+    SubscribeViewSet,
     IngredientViewSet,
     RecipeViewSet,
     ShoppingcartViewSet,
@@ -21,10 +21,10 @@ v1_router.register('ingredients', IngredientViewSet, basename='ingredients')
 v1_router.register('ingredients/<int:ingredient_id>/', IngredientViewSet, basename='ingredient')
 v1_router.register('tags', TagViewSet, basename='tags')
 v1_router.register('tags/<int:tag_id', TagViewSet, basename='tags')
-v1_router.register('subscription', FollowViewSet, basename='subscription')
+v1_router.register('subscription', SubscribeViewSet, basename='subscription')
 
 urlpatterns = [
-    path('v1/', include(v1_router.urls)),
+    path('', include(v1_router.urls)),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),

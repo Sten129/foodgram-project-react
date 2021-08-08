@@ -2,7 +2,7 @@ from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 
 from .models import CustomUser
-from api_v1.models import Follow
+from api.models import Subscribe
 
 
 class CustomUserCreateSerializers(UserCreateSerializer):
@@ -19,10 +19,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed'
+        )
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=request.user, author=obj).exists()
+        return Subscribe.objects.filter(user=request.user, author=obj).exists()

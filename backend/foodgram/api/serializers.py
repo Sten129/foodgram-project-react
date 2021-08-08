@@ -1,11 +1,10 @@
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from users.models import CustomUser
-from .models import (IsFavorited, Follow, Ingredient,
+from .models import (IsFavorited, Subscribe, Ingredient,
                      IngredientInRecipe, Recipe, IsInShoppingCart, Tag)
-
-BASE_URL = 'http://127.0.0.1'
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -27,9 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
                   'first_name', 'last_name',)
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Follow
+        model = Subscribe
         fields = '__all__'
 
 
@@ -57,7 +56,7 @@ class ListRecipeUserSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=request.user, author=obj).exists()
+        return Subscribe.objects.filter(user=request.user, author=obj).exists()
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
@@ -67,10 +66,14 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializerToCreateRecipe(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.id')
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
+    # First Review
+    # id = serializers.SlugRelatedField(slug_field='ingredient.id', read_only=True)
+    # name = serializers.SlugRelatedField(slug_field='ingredient.name', read_only=True)
+    id = serializers.SlugRelatedField(queryset=Ingredient.objects.all(), slug_field='ingredient.id')
+    name = serializers.SlugRelatedField(queryset=Ingredient.objects.all(), slug_field='ingredient.name')
+    measurement_unit = serializers.SlugRelatedField(
+        slug_field='ingredient.measurement_unit',
+        read_only=True
     )
 
     class Meta:
@@ -153,15 +156,15 @@ class ShowFollowersSerializer(serializers.ModelSerializer):
         return len(user.recipes.all())
 
     def check_if_subscribed(self, user):
-        current_user = self.context.get('current_user')
-        other_user = user.following.all()
-        if user.is_anonymous:
+        # current_user = self.context.get('current_user')
+        # other_user = user.following.all()
+        request = self.context.get()
+        if request is None or user.is_anonymous:
             return False
-        if other_user.count() == 0:
-            return False
-        if Follow.objects.filter(user=user, author=current_user).exists():
-            return True
-        return False
+        user = request.user
+        return Subscribe.objects.filter(user=user, author=request.user).exists()
+
+
 
 
 class ShowIngredientsSerializer(serializers.ModelSerializer):
@@ -181,7 +184,7 @@ class UserSerializerModified(BaseUserSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=request.user, author=obj).exists()
+        return Subscribe.objects.filter(user=request.user, author=obj).exists()
 
 
 class ShowRecipeSerializer(serializers.ModelSerializer):
@@ -241,17 +244,17 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
-        for ingredient in ingredients_data:
-            if ingredient['amount'] <= 0:
-                raise serializers.ValidationError(
-                    'Количество ингридиента должно быть больше нуля!')
+        # for ingredient in ingredients_data:
+        #     if ingredient['amount'] <= 0:
+        #         raise serializers.ValidationError(
+        #             'Количество ингридиента должно быть больше нуля!')
         author = self.context.get('request').user
         recipe = Recipe.objects.create(
             author=author, **validated_data)
         recipe.save()
         recipe.tags.set(tags_data)
         for ingredient in ingredients_data:
-            ingredient_model = Ingredient.objects.get(id=ingredient['id'])
+            ingredient_model = get_object_or_404(Ingredient, id=ingredient['id'])
             amount = ingredient['amount']
             IngredientInRecipe.objects.create(
                 ingredient=ingredient_model,
@@ -261,8 +264,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredient_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
+        ingredient_data = validated_data.pop('ingredients')
         for ingredient in ingredient_data:
             if ingredient['amount'] <= 0:
                 raise serializers.ValidationError(

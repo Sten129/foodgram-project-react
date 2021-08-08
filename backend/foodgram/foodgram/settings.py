@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'foodgram',
-    'api_v1',
+    'api',
 
 ]
 
