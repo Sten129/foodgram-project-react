@@ -156,15 +156,11 @@ class ShowFollowersSerializer(serializers.ModelSerializer):
         return len(user.recipes.all())
 
     def check_if_subscribed(self, user):
-        # current_user = self.context.get('current_user')
-        # other_user = user.following.all()
         request = self.context.get()
         if request is None or user.is_anonymous:
             return False
         user = request.user
         return Subscribe.objects.filter(user=user, author=request.user).exists()
-
-
 
 
 class ShowIngredientsSerializer(serializers.ModelSerializer):
@@ -180,11 +176,11 @@ class UserSerializerModified(BaseUserSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name', 'is_subscribed')
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, author):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(user=request.user, author=obj).exists()
+        return Subscribe.objects.filter(user=request.user, author=author).exists()
 
 
 class ShowRecipeSerializer(serializers.ModelSerializer):
@@ -200,23 +196,23 @@ class ShowRecipeSerializer(serializers.ModelSerializer):
                   'is_favorited', 'is_in_shopping_cart',
                   'name', 'image', 'text', 'cooking_time')
 
-    def get_ingredients(self, obj):
-        qs = IngredientInRecipe.objects.filter(recipe=obj)
+    def get_ingredients(self, recipe):
+        qs = IngredientInRecipe.objects.filter(recipe=recipe)
         return IngredientInRecipeSerializer(qs, many=True).data
 
-    def get_is_favorited(self, obj):
+    def get_is_favorited(self, recipe):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
         user = request.user
-        return IsFavorited.objects.filter(recipe=obj, user=user).exists()
+        return IsFavorited.objects.filter(recipe=recipe, user=user).exists()
 
-    def get_is_in_shopping_cart(self, obj):
+    def get_is_in_shopping_cart(self, recipe):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
         user = request.user
-        return IsInShoppingCart.objects.filter(recipe=obj, user=user).exists()
+        return IsInShoppingCart.objects.filter(recipe=recipe, user=user).exists()
 
 
 class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
@@ -244,10 +240,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
-        # for ingredient in ingredients_data:
-        #     if ingredient['amount'] <= 0:
-        #         raise serializers.ValidationError(
-        #             'Количество ингридиента должно быть больше нуля!')
         author = self.context.get('request').user
         recipe = Recipe.objects.create(
             author=author, **validated_data)
@@ -266,22 +258,14 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags')
         ingredient_data = validated_data.pop('ingredients')
-        for ingredient in ingredient_data:
-            if ingredient['amount'] <= 0:
-                raise serializers.ValidationError(
-                    'Количество ингридиента должно быть больше нуля!')
         IngredientInRecipe.objects.filter(recipe=instance).delete()
         for new_ingredient in ingredient_data:
             IngredientInRecipe.objects.create(
-                ingredient=Ingredient.objects.get(id=new_ingredient['id']),
+                ingredient=get_object_or_404(Ingredient, id=new_ingredient['id']),
                 recipe=instance,
                 amount=new_ingredient['amount']
             )
-        instance.name = validated_data.pop('name')
-        instance.text = validated_data.pop('text')
-        if validated_data.get('image') is not None:
-            instance.image = validated_data.pop('image')
-        instance.cooking_time = validated_data.pop('cooking_time')
+        Recipe.objects.filter(id=instance.id).update(**validated_data)
         instance.save()
         instance.tags.set(tags_data)
         return instance

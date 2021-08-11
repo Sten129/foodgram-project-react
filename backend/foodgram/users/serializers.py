@@ -1,13 +1,15 @@
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
-
-from .models import CustomUser
 from api.models import Subscribe
+from django.contrib.auth import get_user_model
 
 
-class CustomUserCreateSerializers(UserCreateSerializer):
+User = get_user_model()
+
+
+class UserCreateSerializers(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
-        model = CustomUser
+        model = User
         fields = (
             'id', 'email', 'username', 'password', 'first_name', 'last_name'
         )
@@ -18,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer пользователя"""
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = (
             'email',
             'id',
@@ -32,4 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(user=request.user, author=obj).exists()
+        return Subscribe.objects.filter(
+            user=request.user,
+            author=obj
+        ).exists()
