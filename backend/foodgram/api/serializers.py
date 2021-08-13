@@ -66,11 +66,14 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializerToCreateRecipe(serializers.ModelSerializer):
-    # First Review
-    # id = serializers.SlugRelatedField(slug_field='ingredient.id', read_only=True)
-    # name = serializers.SlugRelatedField(slug_field='ingredient.name', read_only=True)
-    id = serializers.SlugRelatedField(queryset=Ingredient.objects.all(), slug_field='ingredient.id')
-    name = serializers.SlugRelatedField(queryset=Ingredient.objects.all(), slug_field='ingredient.name')
+    id = serializers.SlugRelatedField(
+        queryset=Ingredient.objects.all(),
+        slug_field='ingredient.id'
+    )
+    name = serializers.SlugRelatedField(
+        queryset=Ingredient.objects.all(),
+        slug_field='ingredient.name'
+    )
     measurement_unit = serializers.SlugRelatedField(
         slug_field='ingredient.measurement_unit',
         read_only=True
@@ -153,14 +156,13 @@ class ShowFollowersSerializer(serializers.ModelSerializer):
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count')
 
     def count_author_recipes(self, user):
-        return len(user.recipes.all())
+        return user.recipes.count()
 
-    def check_if_subscribed(self, user):
-        request = self.context.get()
-        if request is None or user.is_anonymous:
+    def check_is_subscribed(self, user):
+        author = self.context['request'].user
+        if not author.is_authenticated:
             return False
-        user = request.user
-        return Subscribe.objects.filter(user=user, author=request.user).exists()
+        return Subscribe.objects.filter(user=user, author=author).exists()
 
 
 class ShowIngredientsSerializer(serializers.ModelSerializer):
@@ -180,7 +182,9 @@ class UserSerializerModified(BaseUserSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        return Subscribe.objects.filter(user=request.user, author=author).exists()
+        return Subscribe.objects.filter(
+            user=request.user,
+            author=author).exists()
 
 
 class ShowRecipeSerializer(serializers.ModelSerializer):
@@ -212,7 +216,9 @@ class ShowRecipeSerializer(serializers.ModelSerializer):
         if request is None or request.user.is_anonymous:
             return False
         user = request.user
-        return IsInShoppingCart.objects.filter(recipe=recipe, user=user).exists()
+        return IsInShoppingCart.objects.filter(
+            recipe=recipe,
+            user=user).exists()
 
 
 class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
@@ -246,10 +252,12 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         recipe.save()
         recipe.tags.set(tags_data)
         for ingredient in ingredients_data:
-            ingredient_model = get_object_or_404(Ingredient, id=ingredient['id'])
+            ingredient_object = get_object_or_404(
+                Ingredient, id=ingredient['id']
+            )
             amount = ingredient['amount']
             IngredientInRecipe.objects.create(
-                ingredient=ingredient_model,
+                ingredient=ingredient_object,
                 recipe=recipe,
                 amount=amount
             )
@@ -258,14 +266,18 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags')
         ingredient_data = validated_data.pop('ingredients')
-        IngredientInRecipe.objects.filter(recipe=instance).delete()
+        instance.create_recipeingredients_set.all().delete()
         for new_ingredient in ingredient_data:
             IngredientInRecipe.objects.create(
-                ingredient=get_object_or_404(Ingredient, id=new_ingredient['id']),
+                ingredient=get_object_or_404(
+                    Ingredient,
+                    id=new_ingredient['id']
+                ),
                 recipe=instance,
                 amount=new_ingredient['amount']
             )
-        Recipe.objects.filter(id=instance.id).update(**validated_data)
+        # Recipe.objects.filter(id=instance.id).update(**validated_data)
+        instance.update(**validated_data)
         instance.save()
         instance.tags.set(tags_data)
         return instance

@@ -1,4 +1,12 @@
-from api.models import Subscribe, Ingredient, IngredientInRecipe, IsFavorited, IsInShoppingCart, Recipe, Tag
+from api.models import (
+    Subscribe,
+    Ingredient,
+    IngredientInRecipe,
+    IsFavorited,
+    IsInShoppingCart,
+    Recipe,
+    Tag
+)
 from django.contrib import admin
 
 

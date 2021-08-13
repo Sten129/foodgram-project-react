@@ -1,7 +1,5 @@
 from rest_framework import permissions
 
-from rest_framework import permissions
-
 
 class IsSuperUserOrAdminOnly(permissions.BasePermission):
     """permission определяет права суперадминистратора или админа"""
