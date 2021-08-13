@@ -276,7 +276,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 recipe=instance,
                 amount=new_ingredient['amount']
             )
-        # Recipe.objects.filter(id=instance.id).update(**validated_data)
         instance.update(**validated_data)
         instance.save()
         instance.tags.set(tags_data)
