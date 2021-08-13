@@ -67,7 +67,11 @@ class IsInShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     empty_value_display = '-пусто-'
     search_fields = ('user', 'recipe')
-    pass
+
+class SubscribeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'author')
+    search_fields = ('user', 'author')
+    list_filter = ('user', 'author')
 
 
 admin.site.register(Recipe, RecipeAdmin)
@@ -76,3 +80,4 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(IngredientInRecipe, IngredientInRecipeAdmin)
 admin.site.register(IsFavorited, IsFavoritedAdmin)
 admin.site.register(IsInShoppingCart, IsInShoppingCartAdmin)
+admin.site.register(Subscribe, SubscribeAdmin)
