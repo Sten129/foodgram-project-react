@@ -83,5 +83,4 @@ class SubscribeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        user = self.request.user
-        return user.subscribed.all()
+        return self.request.user.subscribed.all()
