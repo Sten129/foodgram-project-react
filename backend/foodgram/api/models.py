@@ -41,7 +41,7 @@ class Recipe(models.Model):
         related_name='recipes',
         blank=True,
         null=True,
-        verbose_name='Тэги рецепта'
+        verbose_name='Тeги рецепта'
     )
     author = models.ForeignKey(
         User,
@@ -134,6 +134,8 @@ class Subscribe(models.Model):
                 fields=['user', 'author'],
                 name='unique_subscribe'),
         ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
         return f'{self.user} => {self.author}'
@@ -157,6 +159,8 @@ class IsFavorited(models.Model):
                 fields=['user', 'recipe'],
                 name='unique_favorited')
         ]
+        verbose_name = 'Любимый'
+        verbose_name_plural = 'Любимые '
 
     def __str__(self):
         return f'{self.user} => {self.recipe}'
@@ -181,6 +185,8 @@ class IsInShoppingCart(models.Model):
                 name='unique_shopping'
             )
         ]
+        verbose_name = 'В корзине'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return f'{self.user} => {self.recipe}'
