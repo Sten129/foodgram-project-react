@@ -1,10 +1,41 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer as BaseUserSerializer
-from drf_extra_fields.fields import Base64ImageField
+# import drf_extra_fields
+# from drf_extra_fields.fields import Base64ImageField
+
+import base64
+import imghdr
+import uuid
+from django.core.files.base import ContentFile
+
+import six
 from rest_framework import serializers
 from users.models import CustomUser
 from .models import (IsFavorited, Subscribe, Ingredient,
                      IngredientInRecipe, Recipe, IsInShoppingCart, Tag)
+
+
+class Base64ImageField(serializers.ImageField):
+
+    def to_internal_value(self, data):
+        if isinstance(data, six.string_types):
+            if 'data:' in data and ';base64,' in data:
+                header, data = data.split(';base64,')
+            try:
+                decoded_file = base64.b64decode(data)
+            except TypeError:
+                self.fail('invalid_image')
+            file_name = str(uuid.uuid4())[:12]
+            file_extension = self.get_file_extension(file_name, decoded_file)
+            complete_file_name = '%s.%s' % (file_name, file_extension,)
+            data = ContentFile(decoded_file, name=complete_file_name)
+        return super().to_internal_value(data)
+
+    def get_file_extension(self, file_name, decoded_file):
+        extension = imghdr.what(file_name, decoded_file)
+        if extension == 'jpeg':
+            extension = 'jpg'
+        return extension
 
 
 class TagSerializer(serializers.ModelSerializer):
