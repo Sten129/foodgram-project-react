@@ -1,5 +1,10 @@
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer as BaseUserSerializer
+
+from djoser.serializers import (
+    UserCreateSerializer as DjoserUserCreateSerializer,
+)
+from djoser.serializers import UserSerializer as DjoserUserSerializer
 # import drf_extra_fields
 # from drf_extra_fields.fields import Base64ImageField
 
@@ -50,12 +55,41 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializers.ModelSerializer):
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CustomUser
+#         fields = ('email', 'id', 'username',
+#                   'first_name', 'last_name',)
+
+
+class UserSerializer(DjoserUserSerializer):
+
     class Meta:
         model = CustomUser
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name',)
+        fields = (
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+        )
 
+
+class UserCreateSerializer(DjoserUserCreateSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
 
 class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -202,25 +236,26 @@ class ShowIngredientsSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount',)
 
 
-class UserSerializerModified(BaseUserSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-
-    class Meta(BaseUserSerializer.Meta):
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', 'is_subscribed')
-
-    def get_is_subscribed(self, author):
-        request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        return Subscribe.objects.filter(
-            user=request.user,
-            author=author).exists()
+# class UserSerializerModified(BaseUserSerializer):
+#     is_subscribed = serializers.SerializerMethodField()
+#
+#     class Meta(BaseUserSerializer.Meta):
+#         fields = ('email', 'id', 'username',
+#                   'first_name', 'last_name', 'is_subscribed')
+#
+#     def get_is_subscribed(self, author):
+#         request = self.context.get('request')
+#         if request is None or request.user.is_anonymous:
+#             return False
+#         return Subscribe.objects.filter(
+#             user=request.user,
+#             author=author).exists()
 
 
 class ShowRecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
-    author = UserSerializerModified(read_only=True)
+    # author = UserSerializerModified(read_only=True)
+    author = UserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -263,7 +298,8 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(max_length=None, use_url=True)
-    author = UserSerializerModified(read_only=True)
+    # author = UserSerializerModified(read_only=True)
+    author = UserSerializer(read_only=True)
     ingredients = AddIngredientToRecipeSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True

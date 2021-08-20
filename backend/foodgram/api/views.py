@@ -25,13 +25,15 @@ class UserListViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     pagination_class = PageNumberPaginatorModified
     queryset = CustomUser.objects.all()
+    http_method_names = ('get', 'post')
     filter_backends = [DjangoFilterBackend]
     filteset_fields = ['email', 'username']
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
-    permission_classes = (AdminOrAuthorOrReadOnly,)
+    # permission_classes = (AdminOrAuthorOrReadOnly,)
+    permission_classes = [AllowAny]
     pagination_class = PageNumberPaginatorModified
     queryset = Recipe.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -44,13 +46,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
-    pagination_class = None
+    pagination_class = PageNumberPaginatorModified
     queryset = Ingredient.objects.all()
 
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
-    pagination_class = None
+    pagination_class = PageNumberPaginatorModified
     permission_classes = (AllowAny,)
     queryset = Tag.objects.all()
 

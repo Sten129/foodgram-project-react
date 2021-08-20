@@ -21,6 +21,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -144,10 +146,13 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
+
+    'HIDE_USERS': False,
+
     'LOGIN_FIELD': 'email',
 
     'SERIALIZERS': {
-        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user_create': 'users.serializers.UserCreateSerializer',
         'user': 'users.serializers.UserSerializer',
         'current_user': 'users.serializers.UserSerializer'
     },
