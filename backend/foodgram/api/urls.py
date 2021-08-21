@@ -12,7 +12,7 @@ from .views import (
 )
 
 v1_router = DefaultRouter()
-v1_router.register('users', UserListViewSet, basename='users')
+# v1_router.register('users', UserListViewSet, basename='users')
 v1_router.register('recipes', RecipeViewSet, basename='recipes')
 v1_router.register(
     'recipe/<int:recipe_id/',
