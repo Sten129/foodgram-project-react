@@ -8,11 +8,15 @@ from .serializers import (
     SubscribeSerializer,
     FavoriteSerializer,
     ShoppingSerializer,
-    UserSerializer
+    UserSerializer,
+    ListRecipeSerializer,
+    CreateRecipeSerializer,
+
 )
 from api.models import Recipe, Ingredient, Tag, Subscribe
 from users.models import CustomUser
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from .paginators import PageNumberPaginatorModified
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated, AllowAny
 from .permissions import AdminOrAuthorOrReadOnly
@@ -39,20 +43,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['author', 'name', 'tags']
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ListRecipeSerializer
+        return CreateRecipeSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
-    pagination_class = PageNumberPaginatorModified
+    filter_backends = [filters.SearchFilter]
+    search_fields = ('name',)
+    pagination_class = None
     queryset = Ingredient.objects.all()
 
+    # def list(self, request):
+    #     queryset = Ingredient.objects.all()
+    #     serializer = IngredientSerializer(queryset, many=True)
+    #     return Response(serializer.data)
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
-    pagination_class = PageNumberPaginatorModified
+    pagination_class = None
     permission_classes = (AllowAny,)
     queryset = Tag.objects.all()
 

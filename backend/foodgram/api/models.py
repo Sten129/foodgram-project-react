@@ -66,7 +66,7 @@ class Recipe(models.Model):
         null=False,
         help_text='Загрузите изображение'
     )
-    description = models.TextField(
+    text = models.TextField(
         verbose_name='Текст',
         null=False,
         help_text='Здесь будет текст Вашего рецепта'

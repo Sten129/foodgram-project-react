@@ -20,7 +20,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'id',
         'name',
         'author',
-        'description',
+        'text',
         'image',
         'cooking_time'
     )

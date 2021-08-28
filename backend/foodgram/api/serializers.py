@@ -1,12 +1,11 @@
 from django.shortcuts import get_object_or_404
+# from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import UserSerializer as BaseUserSerializer
 
 from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer,
 )
 from djoser.serializers import UserSerializer as DjoserUserSerializer
-# import drf_extra_fields
-# from drf_extra_fields.fields import Base64ImageField
 
 import base64
 import imghdr
@@ -63,7 +62,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(DjoserUserSerializer):
-
     class Meta:
         model = CustomUser
         fields = (
@@ -76,7 +74,6 @@ class UserSerializer(DjoserUserSerializer):
 
 
 class UserCreateSerializer(DjoserUserCreateSerializer):
-
     class Meta:
         model = CustomUser
         fields = (
@@ -90,6 +87,7 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
 
 class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -131,14 +129,17 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializerToCreateRecipe(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(
-        queryset=Ingredient.objects.all(),
-        slug_field='ingredient.id'
-    )
-    name = serializers.SlugRelatedField(
-        queryset=Ingredient.objects.all(),
-        slug_field='ingredient.name'
-    )
+    # id = serializers.SlugRelatedField(
+    #     queryset=Ingredient.objects.all(),
+    #     slug_field='ingredient.id'
+    # )
+    # id = serializers.PrimaryKeyRelatedField(many=True, source=Ingredient.objects.all(), read_only=True)
+    # id = serializers.PrimaryKeyRelatedField(many=True, queryset=Ingredient.objects.all())
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    # name = serializers.SlugRelatedField(
+    #     queryset=Ingredient.objects.all(),
+    #     slug_field='ingredient.name'
+    # )
     measurement_unit = serializers.SlugRelatedField(
         slug_field='ingredient.measurement_unit',
         read_only=True
@@ -146,7 +147,7 @@ class IngredientInRecipeSerializerToCreateRecipe(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientInRecipe
-        fields = ('id', 'name', 'measurement_unit', 'amount',)
+        fields = ('id', 'measurement_unit', 'amount',)
 
 
 class ListRecipeSerializer(serializers.ModelSerializer):
@@ -297,6 +298,7 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
+    # image = Base64ImageField(max_length=None, use_url=True)
     image = Base64ImageField(max_length=None, use_url=True)
     # author = UserSerializerModified(read_only=True)
     author = UserSerializer(read_only=True)
