@@ -1,12 +1,4 @@
-from api.models import (
-    Subscribe,
-    Ingredient,
-    IngredientInRecipe,
-    IsFavorited,
-    IsInShoppingCart,
-    Recipe,
-    Tag
-)
+from api.models import Ingredient, IngredientInRecipe, IsFavorited, IsInShoppingCart, Recipe, Subscribe, Tag
 from django.contrib import admin
 
 
@@ -67,6 +59,7 @@ class IsInShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     empty_value_display = '-пусто-'
     search_fields = ('user', 'recipe')
+
 
 class SubscribeAdmin(admin.ModelAdmin):
     list_display = ('user', 'author')

@@ -1,20 +1,25 @@
-from django.shortcuts import get_object_or_404
-
-from djoser.serializers import (
-    UserCreateSerializer as DjoserUserCreateSerializer,
-)
-from djoser.serializers import UserSerializer as DjoserUserSerializer
-
 import base64
 import imghdr
 import uuid
-from django.core.files.base import ContentFile
 
 import six
+from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
+from djoser.serializers import (
+    UserCreateSerializer as DjoserUserCreateSerializer
+)
+from djoser.serializers import UserSerializer as DjoserUserSerializer
 from rest_framework import serializers
 from users.models import CustomUser
-from .models import (IsFavorited, Subscribe, Ingredient,
-                     IngredientInRecipe, Recipe, IsInShoppingCart, Tag)
+
+from .models import (
+    Ingredient,
+    IngredientInRecipe,
+    IsFavorited,
+    IsInShoppingCart,
+    Recipe,
+    Subscribe,
+    Tag)
 
 
 class Base64ImageField(serializers.ImageField):

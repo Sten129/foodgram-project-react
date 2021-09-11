@@ -1,21 +1,20 @@
+from api.models import Ingredient, Recipe, Subscribe, Tag
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
-from api.models import Recipe, Ingredient, Tag, Subscribe
+from rest_framework import filters, viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.models import CustomUser
+
 from .paginators import PageNumberPaginatorModified
 from .serializers import (
-    RecipeSerializer,
-    IngredientSerializer,
-    TagSerializer,
-    SubscribeSerializer,
-    FavoriteSerializer,
-    ShoppingSerializer,
-    UserSerializer,
-    ListRecipeSerializer,
     CreateRecipeSerializer,
-
+    FavoriteSerializer,
+    IngredientSerializer,
+    ListRecipeSerializer,
+    RecipeSerializer,
+    ShoppingSerializer,
+    SubscribeSerializer,
+    TagSerializer,
+    UserSerializer
 )
 
 
