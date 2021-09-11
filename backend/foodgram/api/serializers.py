@@ -5,9 +5,7 @@ import uuid
 import six
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from djoser.serializers import (
-    UserCreateSerializer as DjoserUserCreateSerializer
-)
+from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer
 from djoser.serializers import UserSerializer as DjoserUserSerializer
 from rest_framework import serializers
 from users.models import CustomUser
