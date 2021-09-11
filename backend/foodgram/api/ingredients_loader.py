@@ -1,8 +1,9 @@
-from api.models import Ingredient
 import csv
-from django.core.wsgi import get_wsgi_application
 import os
 import sys
+
+from api.models import Ingredient
+from django.core.wsgi import get_wsgi_application
 
 csv_filepathname = "ingredients.csv"
 your_djangoproject_home = "foodgram"
