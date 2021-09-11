@@ -2,7 +2,6 @@ from rest_framework import permissions
 
 
 class IsSuperUserOrAdminOnly(permissions.BasePermission):
-    """permission определяет права суперадминистратора или админа"""
     message = 'У вас недостаточно прав.'
 
     def has_permission(self, request, view):
@@ -10,7 +9,6 @@ class IsSuperUserOrAdminOnly(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
-    """permission определяет права администратора или только на чтение"""
     message = 'У вас недостаточно прав.'
 
     def has_permission(self, request, view):
