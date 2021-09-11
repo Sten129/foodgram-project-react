@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-# from drf_extra_fields.fields import Base64ImageField
-from djoser.serializers import UserSerializer as BaseUserSerializer
 
 from djoser.serializers import (
     UserCreateSerializer as DjoserUserCreateSerializer,
@@ -52,13 +50,6 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = '__all__'
-
-
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CustomUser
-#         fields = ('email', 'id', 'username',
-#                   'first_name', 'last_name',)
 
 
 class UserSerializer(DjoserUserSerializer):
@@ -129,17 +120,8 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializerToCreateRecipe(serializers.ModelSerializer):
-    # id = serializers.SlugRelatedField(
-    #     queryset=Ingredient.objects.all(),
-    #     slug_field='ingredient.id'
-    # )
-    # id = serializers.PrimaryKeyRelatedField(many=True, source=Ingredient.objects.all(), read_only=True)
-    # id = serializers.PrimaryKeyRelatedField(many=True, queryset=Ingredient.objects.all())
     id = serializers.ReadOnlyField(source='ingredient.id')
-    # name = serializers.SlugRelatedField(
-    #     queryset=Ingredient.objects.all(),
-    #     slug_field='ingredient.name'
-    # )
+
     measurement_unit = serializers.SlugRelatedField(
         slug_field='ingredient.measurement_unit',
         read_only=True
@@ -237,25 +219,8 @@ class ShowIngredientsSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount',)
 
 
-# class UserSerializerModified(BaseUserSerializer):
-#     is_subscribed = serializers.SerializerMethodField()
-#
-#     class Meta(BaseUserSerializer.Meta):
-#         fields = ('email', 'id', 'username',
-#                   'first_name', 'last_name', 'is_subscribed')
-#
-#     def get_is_subscribed(self, author):
-#         request = self.context.get('request')
-#         if request is None or request.user.is_anonymous:
-#             return False
-#         return Subscribe.objects.filter(
-#             user=request.user,
-#             author=author).exists()
-
-
 class ShowRecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
-    # author = UserSerializerModified(read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
@@ -298,9 +263,7 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
-    # image = Base64ImageField(max_length=None, use_url=True)
     image = Base64ImageField(max_length=None, use_url=True)
-    # author = UserSerializerModified(read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = AddIngredientToRecipeSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(

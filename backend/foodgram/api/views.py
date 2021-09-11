@@ -1,6 +1,10 @@
-from rest_framework import viewsets, filters
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from api.models import Recipe, Ingredient, Tag, Subscribe
+from users.models import CustomUser
+from .paginators import PageNumberPaginatorModified
 from .serializers import (
     RecipeSerializer,
     IngredientSerializer,
@@ -13,15 +17,6 @@ from .serializers import (
     CreateRecipeSerializer,
 
 )
-from api.models import Recipe, Ingredient, Tag, Subscribe
-from users.models import CustomUser
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from .paginators import PageNumberPaginatorModified
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated, AllowAny
-from .permissions import AdminOrAuthorOrReadOnly
-
-
 
 
 class UserListViewSet(viewsets.ModelViewSet):
@@ -54,7 +49,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return context
 
 
-
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
@@ -63,10 +57,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
     pagination_class = None
     queryset = Ingredient.objects.all()
 
-    # def list(self, request):
-    #     queryset = Ingredient.objects.all()
-    #     serializer = IngredientSerializer(queryset, many=True)
-    #     return Response(serializer.data)
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
